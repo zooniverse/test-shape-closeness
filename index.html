@@ -1,0 +1,65 @@
+<!DOCTYPE html>
+<html>
+  <head>
+    <meta charset="utf-8">
+    <title>Test shape closeness</title>
+  </head>
+
+  <body>
+    <div id="container">
+      <label>
+        <textarea id="first-shape" rows="8" cols="40"></textarea>
+      </label>
+
+      <label>
+        <textarea id="second-shape" rows="8" cols="40"></textarea>
+      </label>
+      <br />
+
+      <canvas id="canvas" width="500" height="500" style="outline: 1px solid gray;"></canvas>
+      <br />
+
+      <label>
+        Closeness:
+        <meter id="closeness" low="0.25"></meter>
+      </label>
+    </div>
+
+    <script src="./index.js"></script>
+    <script>
+      (function() {
+        var firstShapeInput = document.getElementById('first-shape');
+        var secondShapeInput = document.getElementById('second-shape');
+
+        firstShapeInput.value = JSON.stringify({
+          points: [
+            {x: 50, y: -33},
+            {x: 133, y: 50},
+            {x: 50, y: 133},
+            {x: -33, y: 50},
+          ]
+        }, null, 2);
+
+        secondShapeInput.value = JSON.stringify({
+          x: 50,
+          y: 50,
+          r: 50,
+        }, null, 2);
+
+        function update() {
+          var container = document.getElementById('closeness');
+          var output = document.getElementById('closeness');
+          var firstShape = JSON.parse(firstShapeInput.value);
+          var secondShape = JSON.parse(secondShapeInput.value);
+          output.value = testShapeCloseness(firstShape, secondShape, {
+            canvas:  document.getElementById('canvas'),
+            allowance: 10,
+          });
+        }
+
+        update();
+        container.addEventListener('input', update);
+      }());
+    </script>
+  </body>
+</html>

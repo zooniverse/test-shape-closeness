@@ -1,0 +1,8 @@
+{
+  "name": "test-shape-closeness",
+  "version": "0.0.1",
+  "devDependencies": {
+    "eslint": "^1.8.0",
+    "eslint-config-airbnb": "^0.1.0"
+  }
+}
