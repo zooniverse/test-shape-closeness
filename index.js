@@ -1,4 +1,6 @@
 (function() {
+  'use strict';
+
   var DEFAULT_CANVAS_WIDTH = 1000;
   var DEFAULT_CANVAS_HEIGHT = 1000;
   var DEFAULT_ALLOWANCE = 10;
@@ -91,15 +93,17 @@
 
   function drawShapes(shapes, options) {
     var config = Object.assign({
-      allowance: DEFAULT_ALLOWANCE,
       canvas: null,
-    }, options)
+      width: DEFAULT_CANVAS_WIDTH,
+      height: DEFAULT_CANVAS_HEIGHT,
+      allowance: DEFAULT_ALLOWANCE,
+    }, options);
 
     var canvas = config.canvas;
     if (canvas === null) {
       canvas = document.createElement('canvas');
-      canvas.width = DEFAULT_CANVAS_WIDTH;
-      canvas.height = DEFAULT_CANVAS_HEIGHT;
+      canvas.width = config.width;
+      canvas.height = config.height;
     }
     canvas.width = canvas.width; // Clear the canvas.
 
@@ -121,8 +125,8 @@
     var opacityValue = Math.floor(opacity * 255);
     var pixels = 0;
     var data = context.getImageData(0, 0, context.canvas.width, context.canvas.height).data;
-    for (var i = 3; i < data.length; i += 4) {
-      if (data[i] > opacityValue) {
+    for (var alphaIndex = 3; alphaIndex < data.length; alphaIndex += 4) {
+      if (data[alphaIndex] > opacityValue) {
         pixels += 1;
       }
     }
