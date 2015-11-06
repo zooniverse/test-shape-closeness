@@ -7,89 +7,60 @@
   var DRAWING_OPACITY = 0.25;
 
   var SHAPES = {
-    point: {
-      signature: ['x', 'y'],
-      draw: function drawPoint(context, shape) {
-        context.translate(shape.x, shape.y);
-        context.beginPath();
-        context.arc(0, 0, context.lineWidth, 0, Math.PI * 2, false);
-        context.closePath();
-        context.fill();
-      },
+    point: function drawPoint(context, shape) {
+      context.translate(shape.x, shape.y);
+      context.beginPath();
+      context.arc(0, 0, context.lineWidth, 0, Math.PI * 2, false);
+      context.closePath();
+      context.fill();
     },
 
-    line: {
-      signature: ['x1', 'y1', 'x2', 'y2'],
-      draw: function drawLine(context, shape) {
-        context.beginPath();
-        context.moveTo(shape.x1, shape.y1);
-        context.lineTo(shape.x2, shape.y2);
-        context.stroke();
-      },
+    line: function drawLine(context, shape) {
+      context.beginPath();
+      context.moveTo(shape.x1, shape.y1);
+      context.lineTo(shape.x2, shape.y2);
+      context.stroke();
     },
 
-    circle: {
-      signature: ['x', 'y', 'r'],
-      draw: function drawCircle(context, shape) {
-        context.translate(shape.x, shape.y);
-        context.beginPath();
-        context.arc(0, 0, shape.r, 0, Math.PI * 2, false);
-        context.closePath();
-        context.fill();
-      },
+    circle: function drawCircle(context, shape) {
+      context.translate(shape.x, shape.y);
+      context.beginPath();
+      context.arc(0, 0, shape.r, 0, Math.PI * 2, false);
+      context.closePath();
+      context.fill();
     },
 
-    ellispe: {
-      signature: ['x', 'y', 'r1', 'r2', 'angle'],
-      draw: function drawEllispe(context, shape) {
-        context.translate(shape.x, shape.y);
-        context.scale(1, shape.r2 / shape.r1);
-        context.beginPath();
-        context.arc(0, 0, shape.r1, 0, Math.PI * 2, false);
-        context.closePath();
-        context.fill();
-      },
+    ellispe: function drawEllispe(context, shape) {
+      context.translate(shape.x, shape.y);
+      context.scale(1, shape.r2 / shape.r1);
+      context.beginPath();
+      context.arc(0, 0, shape.r1, 0, Math.PI * 2, false);
+      context.closePath();
+      context.fill();
     },
 
-    rect: {
-      signature: ['x', 'y', 'width', 'height'],
-      draw: function drawRect(context, shape) {
-        context.translate(shape.x, shape.y);
-        context.beginPath();
-        context.moveTo(0, 0);
-        context.lineTo(shape.width, 0);
-        context.lineTo(shape.width, shape.height);
-        context.lineTo(0, shape.height);
-        context.closePath();
-        context.fill();
-      },
+    rect: function drawRect(context, shape) {
+      context.translate(shape.x, shape.y);
+      context.beginPath();
+      context.moveTo(0, 0);
+      context.lineTo(shape.width, 0);
+      context.lineTo(shape.width, shape.height);
+      context.lineTo(0, shape.height);
+      context.closePath();
+      context.fill();
     },
 
-    polygon: {
-      signature: ['points'],
-      draw: function drawPolygon(context, shape) {
-        context.beginPath();
-        context.moveTo(shape.points[0].x, shape.points[0].y);
-        shape.points.slice(1).forEach(function drawSegment(point) {
-          context.lineTo(point.x, point.y);
-        });
-        context.lineTo(shape.points[0].x, shape.points[0].y);
-        context.closePath();
-        context.fill();
-      },
+    polygon: function drawPolygon(context, shape) {
+      context.beginPath();
+      context.moveTo(shape.points[0].x, shape.points[0].y);
+      shape.points.slice(1).forEach(function drawSegment(point) {
+        context.lineTo(point.x, point.y);
+      });
+      context.lineTo(shape.points[0].x, shape.points[0].y);
+      context.closePath();
+      context.fill();
     },
   };
-
-  var shapesBySignature = Object.keys(SHAPES).reduce(function addSignature(allSignatures, shapeName) {
-    var shapeSignature = SHAPES[shapeName].signature.sort().join(',');
-    allSignatures[shapeSignature] = shapeName;
-    return allSignatures;
-  }, {});
-
-  function determineShape(data) {
-    var dataSignature = Object.keys(data).sort().join(',');
-    return shapesBySignature[dataSignature];
-  }
 
   function drawShapes(shapes, options) {
     var config = Object.assign({
@@ -115,7 +86,7 @@
 
     shapes.forEach(function drawShape(shape) {
       context.save();
-      SHAPES[shape.type].draw(context, shape);
+      SHAPES[shape.type](context, shape);
       context.restore();
     });
     return context;
@@ -134,13 +105,7 @@
   }
 
   function testShapeCloseness(shapes, options) {
-    var shapeTypes = shapes.map(determineShape);
-    var typedShapes = shapes.map(function assignType(shape, iteration) {
-      return Object.assign({}, shape, {
-        type: shapeTypes[iteration],
-      });
-    });
-    var context = drawShapes(typedShapes, options);
+    var context = drawShapes(shapes, options);
     var intersectArea = countFilledPixels(context, DRAWING_OPACITY);
     var unionArea = countFilledPixels(context, 0);
     return intersectArea / unionArea;
