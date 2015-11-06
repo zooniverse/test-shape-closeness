@@ -51,7 +51,7 @@
           var output = document.getElementById('closeness');
           var firstShape = JSON.parse(firstShapeInput.value);
           var secondShape = JSON.parse(secondShapeInput.value);
-          output.value = testShapeCloseness(firstShape, secondShape, {
+          output.value = testShapeCloseness([firstShape, secondShape], {
             canvas:  document.getElementById('canvas'),
             allowance: 10,
           });

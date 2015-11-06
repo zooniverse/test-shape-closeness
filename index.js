@@ -133,12 +133,14 @@
     return pixels;
   }
 
-  function testShapeCloseness(first, second, options) {
-    var firstShapeType = determineShape(first);
-    var secondShapeType = determineShape(second);
-    var firstShape = Object.assign({}, first, {type: firstShapeType});
-    var secondShape = Object.assign({}, second, {type: secondShapeType});
-    var context = drawShapes([firstShape, secondShape], options);
+  function testShapeCloseness(shapes, options) {
+    var shapeTypes = shapes.map(determineShape);
+    var typedShapes = shapes.map(function assignType(shape, iteration) {
+      return Object.assign({}, shape, {
+        type: shapeTypes[iteration],
+      });
+    });
+    var context = drawShapes(typedShapes, options);
     var intersectArea = countFilledPixels(context, DRAWING_OPACITY);
     var unionArea = countFilledPixels(context, 0);
     return intersectArea / unionArea;
