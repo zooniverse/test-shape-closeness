@@ -21,7 +21,8 @@
 
       <label>
         Closeness:
-        <meter id="closeness" low="0.25"></meter>
+        <meter class="result" low="0.25"></meter>
+        <output class="result"></output>
       </label>
     </div>
 
@@ -34,10 +35,10 @@
         firstShapeInput.value = JSON.stringify({
           type: 'polygon',
           points: [
-            {x: 50, y: -33},
-            {x: 133, y: 50},
-            {x: 50, y: 133},
-            {x: -33, y: 50},
+            {x: 0, y: 0},
+            {x: 100, y: 0},
+            {x: 100, y: 100},
+            {x: 0, y: 100},
           ]
         }, null, 2);
 
@@ -50,12 +51,15 @@
 
         function update() {
           var container = document.getElementById('closeness');
-          var output = document.getElementById('closeness');
+          var outputs = document.getElementsByClassName('result');
           var firstShape = JSON.parse(firstShapeInput.value);
           var secondShape = JSON.parse(secondShapeInput.value);
-          output.value = testShapeCloseness([firstShape, secondShape], {
+          var value = testShapeCloseness([firstShape, secondShape], {
             canvas:  document.getElementById('canvas'),
             allowance: 10,
+          });
+          Array.prototype.forEach.call(outputs, function(output) {
+            output.value = value;
           });
         }
 

@@ -3,7 +3,8 @@
 
   var DEFAULT_CANVAS_WIDTH = 1000;
   var DEFAULT_CANVAS_HEIGHT = 1000;
-  var DEFAULT_ALLOWANCE = 10;
+  var DEFAULT_ALLOWANCE = 20;
+
   var DRAWING_OPACITY = 0.25;
 
   var SHAPES = {
@@ -62,6 +63,18 @@
     },
   };
 
+  function applyThreshold(context, opacity) {
+    var minOpacity = Math.floor(opacity * 255);
+    var imageData = context.getImageData(0, 0, context.canvas.width, context.canvas.height);
+    var data = imageData.data;
+    for (var alphaIndex = 3; alphaIndex < data.length; alphaIndex += 4) {
+      if (data[alphaIndex] < minOpacity) {
+        data[alphaIndex] = 0;
+      }
+    }
+    context.putImageData(imageData, 0, 0);
+  }
+
   function drawShapes(shapes, options) {
     var config = Object.assign({
       canvas: null,
@@ -76,9 +89,11 @@
       canvas.width = config.width;
       canvas.height = config.height;
     }
-    canvas.width = canvas.width; // Clear the canvas.
+    testShapeCloseness.__lastCanvas = canvas; // This is useful for debugging.
 
     var context = canvas.getContext('2d');
+
+    context.clearRect(0, 0, canvas.width, canvas.height);
     context.globalAlpha = DRAWING_OPACITY;
     context.fillStyle = 'black';
     context.strokeStyle = 'black';
@@ -88,6 +103,7 @@
       context.save();
       SHAPES[shape.type](context, shape);
       context.restore();
+      applyThreshold(context, DRAWING_OPACITY);
     });
     return context;
   }
@@ -110,6 +126,10 @@
     var unionArea = countFilledPixels(context, 0);
     return intersectArea / unionArea;
   }
+
+  testShapeCloseness.__internals = {
+    shapes: SHAPES,
+  };
 
   if (typeof module !== 'undefined') {
     module.exports = testShapeCloseness;
