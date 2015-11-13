@@ -4,6 +4,8 @@ var testShapeCloseness = require('..');
 var Canvas = require('canvas');
 var assert = require('assert');
 
+var OVERLAP_TOLERANCE = 0.05;
+
 var exampleShapeData = {
   point: {
     whole: {type: 'point', x: 50, y: 50},
@@ -12,7 +14,8 @@ var exampleShapeData = {
     whole: {type: 'line', x1: 25, y1: 25, x2: 75, y2: 75},
   },
   circle: {
-    whole: {type: 'circle', x: 50, y: 50, r: 50},
+    whole: {type: 'circle', x: 50, y: 50, r: Math.sqrt(5000 / Math.PI)},
+    half: {type: 'circle', x: 50, y: 50, r: Math.sqrt(2500 / Math.PI)},
   },
   ellispe: {
     whole: {type: 'ellispe', x: 50, y: 50, r1: 25, r2: 50},
@@ -22,7 +25,8 @@ var exampleShapeData = {
     half: {type: 'rect', x: 0, y: 0, width: 100, height: 50},
   },
   polygon: {
-    whole: {type: 'polygon', points: [{x: 25, y: 25}, {x: 75, y: 25}, {x: 75, y: 75}]},
+    whole: {type: 'polygon', points: [{x: 50, y: 0}, {x: 100, y: 50}, {x: 50, y: 100}, {x: 0, y: 50}]},
+    half: {type: 'polygon', points: [{x: 50, y: 0}, {x: 100, y: 50}, {x: 50, y: 100}]},
   },
 };
 
@@ -56,14 +60,14 @@ Object.keys(testShapeCloseness.__internals.shapes).forEach(function(shape) {
     it('overlaps itself perfectly', function() {
       var shapesToCompare = [wholeShapeData, wholeShapeData];
       var overlap = testShapeCloseness(shapesToCompare, testOptions);
-      assert.equal(overlap, 1);
+      assert(1 - overlap < OVERLAP_TOLERANCE);
     });
 
     if (halfShapeData !== undefined) {
       it('overlaps a shape half as big', function() {
         var shapesToCompare = [wholeShapeData, halfShapeData];
         var overlap = testShapeCloseness(shapesToCompare, testOptions);
-        assert.equal(overlap, 0.5);
+        assert(0.5 - overlap < OVERLAP_TOLERANCE);
       });
     }
   });
