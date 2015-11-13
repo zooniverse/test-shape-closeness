@@ -1,17 +1,17 @@
-(function() {
+(function () {
   'use strict';
 
   var DEFAULT_CONFIG = {
     canvas: null,
     width: 1000,
     height: 1000,
-    allowance: 20,
+    allowance: 20
   };
 
   var SHAPE_ALPHA = 15;
 
   var SHAPES = {
-    point: function drawPoint(context, shape) {
+    point: function (context, shape) {
       context.translate(shape.x, shape.y);
       context.beginPath();
       context.arc(0, 0, context.lineWidth, 0, Math.PI * 2, false);
@@ -19,14 +19,14 @@
       context.fill();
     },
 
-    line: function drawLine(context, shape) {
+    line: function (context, shape) {
       context.beginPath();
       context.moveTo(shape.x1, shape.y1);
       context.lineTo(shape.x2, shape.y2);
       context.stroke();
     },
 
-    circle: function drawCircle(context, shape) {
+    circle: function (context, shape) {
       context.translate(shape.x, shape.y);
       context.beginPath();
       context.arc(0, 0, shape.r, 0, Math.PI * 2, false);
@@ -34,7 +34,7 @@
       context.fill();
     },
 
-    ellispe: function drawEllispe(context, shape) {
+    ellispe: function (context, shape) {
       context.translate(shape.x, shape.y);
       context.scale(1, shape.r2 / shape.r1);
       context.beginPath();
@@ -43,7 +43,7 @@
       context.fill();
     },
 
-    rect: function drawRect(context, shape) {
+    rect: function (context, shape) {
       context.translate(shape.x, shape.y);
       context.beginPath();
       context.moveTo(0, 0);
@@ -54,19 +54,19 @@
       context.fill();
     },
 
-    polygon: function drawPolygon(context, shape) {
+    polygon: function (context, shape) {
       context.beginPath();
       context.moveTo(shape.points[0].x, shape.points[0].y);
-      shape.points.slice(1).forEach(function drawSegment(point) {
+      shape.points.slice(1).forEach(function (point) {
         context.lineTo(point.x, point.y);
       });
       context.lineTo(shape.points[0].x, shape.points[0].y);
       context.closePath();
       context.fill();
-    },
+    }
   };
 
-  function getContext(options) {
+  function getContext (options) {
     var config = Object.assign({}, DEFAULT_CONFIG, options);
 
     var canvas = config.canvas;
@@ -85,7 +85,7 @@
     return context;
   }
 
-  function getNonAntialiased(context) {
+  function getNonAntialiasedData (context) {
     var imageData = context.getImageData(0, 0, context.canvas.width, context.canvas.height);
     var data = imageData.data;
     for (var alphaIndex = 3; alphaIndex < data.length; alphaIndex += 4) {
@@ -94,7 +94,7 @@
     return imageData;
   }
 
-  function assignImageDataAlpha(original, overlay) {
+  function assignImageDataAlpha (original, overlay) {
     var originalData = original.data;
     var overlayData = overlay.data;
     for (var alphaIndex = 3; alphaIndex < originalData.length; alphaIndex += 4) {
@@ -102,7 +102,7 @@
     }
   }
 
-  function drawShape(context, shape) {
+  function drawShape (context, shape) {
     var canvas = context.canvas;
     var originalImageData = context.getImageData(0, 0, canvas.width, canvas.height);
 
@@ -111,12 +111,12 @@
     SHAPES[shape.type](context, shape);
     context.restore();
 
-    var newImageData = getNonAntialiased(context);
+    var newImageData = getNonAntialiasedData(context);
     assignImageDataAlpha(originalImageData, newImageData);
     context.putImageData(originalImageData, 0, 0);
   }
 
-  function countFilledPixels(context, minAlpha) {
+  function countFilledPixels (context, minAlpha) {
     var pixels = 0;
     var data = context.getImageData(0, 0, context.canvas.width, context.canvas.height).data;
     for (var alphaIndex = 3; alphaIndex < data.length; alphaIndex += 4) {
@@ -127,7 +127,7 @@
     return pixels;
   }
 
-  function testShapeCloseness(shapes, options) {
+  function testShapeCloseness (shapes, options) {
     var context = getContext(options);
     shapes.forEach(drawShape.bind(null, context));
     var intersectArea = countFilledPixels(context, SHAPE_ALPHA);
@@ -136,7 +136,7 @@
   }
 
   testShapeCloseness.__internals = {
-    shapes: SHAPES,
+    shapes: SHAPES
   };
 
   if (typeof module !== 'undefined') {
