@@ -79,6 +79,7 @@
     testShapeCloseness.__lastCanvas = canvas; // For debugging
 
     var context = canvas.getContext('2d');
+    context.clearRect(0, 0, canvas.width, canvas.height);
     context.fillStyle = 'black';
     context.strokeStyle = 'black';
     context.lineWidth = config.allowance;

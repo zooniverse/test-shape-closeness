@@ -4,7 +4,20 @@ var testShapeCloseness = require('..');
 var Canvas = require('canvas');
 var assert = require('assert');
 
-var OVERLAP_TOLERANCE = 0.05;
+var DEFAULT_TOLERANCE = 0.05;
+
+function assertApproximately (actual, expected, tolerance, message) {
+  if (typeof tolerance === 'string') {
+    message = tolerance;
+    tolerance = undefined;
+  }
+  if (tolerance === undefined) {
+    tolerance = expected * DEFAULT_TOLERANCE;
+  }
+  if (Math.abs(expected - actual) > tolerance) {
+    assert.fail(actual, expected + ' ± ' + tolerance, message, '==', assertApproximately);
+  }
+}
 
 var exampleShapeData = {
   point: {
@@ -14,11 +27,12 @@ var exampleShapeData = {
     whole: {type: 'line', x1: 25, y1: 25, x2: 75, y2: 75}
   },
   circle: {
-    whole: {type: 'circle', x: 50, y: 50, r: Math.sqrt(5000 / Math.PI)},
-    half: {type: 'circle', x: 50, y: 50, r: Math.sqrt(2500 / Math.PI)}
+    whole: {type: 'circle', x: 50, y: 50, r: Math.sqrt(500 / Math.PI)},
+    half: {type: 'circle', x: 50, y: 50, r: Math.sqrt(250 / Math.PI)}
   },
   ellispe: {
-    whole: {type: 'ellispe', x: 50, y: 50, r1: 25, r2: 50}
+    whole: {type: 'ellispe', x: 50, y: 50, r1: Math.sqrt(500 / Math.PI), r2: Math.sqrt(400 / Math.PI)},
+    half: {type: 'ellispe', x: 50, y: 50, r1: Math.sqrt(250 / Math.PI), r2: Math.sqrt(200 / Math.PI)}
   },
   rect: {
     whole: {type: 'rect', x: 0, y: 0, width: 100, height: 100},
@@ -60,14 +74,14 @@ Object.keys(testShapeCloseness.__internals.shapes).forEach(function (shape) {
     it('overlaps itself perfectly', function () {
       var shapesToCompare = [wholeShapeData, wholeShapeData];
       var overlap = testShapeCloseness(shapesToCompare, testOptions);
-      assert(1 - overlap < OVERLAP_TOLERANCE);
+      assertApproximately(overlap, 1);
     });
 
     if (halfShapeData !== undefined) {
       it('overlaps a shape half as big', function () {
         var shapesToCompare = [wholeShapeData, halfShapeData];
         var overlap = testShapeCloseness(shapesToCompare, testOptions);
-        assert(0.5 - overlap < OVERLAP_TOLERANCE);
+        assertApproximately(overlap, 0.5);
       });
     }
   });
