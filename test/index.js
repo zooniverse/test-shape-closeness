@@ -3,21 +3,7 @@
 var testShapeCloseness = require('..');
 var Canvas = require('canvas');
 var assert = require('assert');
-
-var DEFAULT_TOLERANCE = 0.05;
-
-function assertApproximately (actual, expected, tolerance, message) {
-  if (typeof tolerance === 'string') {
-    message = tolerance;
-    tolerance = undefined;
-  }
-  if (tolerance === undefined) {
-    tolerance = expected * DEFAULT_TOLERANCE;
-  }
-  if (Math.abs(expected - actual) > tolerance) {
-    assert.fail(actual, expected + ' ± ' + tolerance, message, '==', assertApproximately);
-  }
-}
+var assertApproximately = require('assert-approximately');
 
 var exampleShapeData = {
   point: {
