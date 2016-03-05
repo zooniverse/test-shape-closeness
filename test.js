@@ -1,6 +1,6 @@
 /* eslint-env mocha */
 
-var testShapeCloseness = require('..');
+var testShapeCloseness = require('./index');
 var Canvas = require('canvas');
 var assert = require('assert');
 var assertApproximately = require('assert-approximately');
